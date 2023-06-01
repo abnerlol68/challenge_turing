@@ -35,3 +35,31 @@ ORIGINS=http(s)?://localhost(:[0-9]+)?
 Dentro de la carpeta `server/` se debe crear el entorno virtual del servidor mediante el siguiente comando:
 
 `python -m virtualenv env`
+
+Después para activar el entorno virtual de python se ejecuta lo siguiente:
+
+`./server/env/Scripts/activate`
+
+Para instalar las dependencias que ocupa flask se necesita ejecutar el siguiente comando:
+
+`pip install -r server/requirements.txt`
+
+Y para poner en marcha el servidor:
+
+`python server/src/index.py`
+
+Ahora para correr el cliente (front):
+
+`cd client/`
+
+`npm i`
+
+Para esta parte también se necesita un archivo .env
+
+`touch client/.env`
+
+`echo VITE_API=http://127.0.0.1:5000/api/ > .env`
+
+Finalmente para arrancar el servidor de desarrollo
+
+`npm run dev`

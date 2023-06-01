@@ -57,9 +57,7 @@ CREATE TABLE IF NOT EXISTS products_imgs
 
 ### Insets ###
 INSERT INTO users (u_type, u_name, u_lastname, u_email, u_password)
-    VALUE ('A', 'Abner', 'Perez', 'abner@email.com', '123456');
-INSERT INTO users (u_type, u_name, u_lastname, u_email, u_password)
-    VALUE ('U', 'Crys', 'Alvaro', 'crys@email.com', '123456');
+    VALUE ('A', 'Abner', 'Perez', 'abner@email.com', '$2b$12$S2r3MEgGggyWL48mONltHuZJGMaflurxY3hE5kKmquknLEPoPjX/S');
 
 INSERT INTO categories (c_name)
 VALUES ('Electrónica'),
@@ -173,4 +171,13 @@ BEGIN
 END ;;
 DELIMITER ;
 
-CALL get_products_imgs(104);
+# validate/user
+DROP PROCEDURE IF EXISTS `validate_user`;
+DELIMITER ;;
+CREATE PROCEDURE `validate_user`(
+    IN email_u VARCHAR(45)
+)
+BEGIN
+    SELECT * FROM users WHERE u_email = email_u;
+END ;;
+DELIMITER ;
