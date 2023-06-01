@@ -173,4 +173,15 @@ BEGIN
 END ;;
 DELIMITER ;
 
-CALL get_products_imgs(104);
+# validate/user
+DROP PROCEDURE IF EXISTS `validate_user`;
+DELIMITER ;;
+CREATE PROCEDURE `validate_user`(
+    IN email_u VARCHAR(45)
+)
+BEGIN
+    SELECT * FROM users WHERE u_email = email_u;
+END ;;
+DELIMITER ;
+
+DELETE FROM users WHERE u_id = 100;
