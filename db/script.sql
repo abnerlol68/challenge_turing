@@ -34,8 +34,11 @@ CREATE TABLE IF NOT EXISTS products
     p_name     VARCHAR(45)   NOT NULL COMMENT 'Product name',
     p_price    DECIMAL(9, 2) NOT NULL COMMENT 'Product price',
     p_category INT UNSIGNED  NOT NULL COMMENT 'Product category',
+    p_user     INT UNSIGNED  NOT NULL COMMENT 'Product user',
     CONSTRAINT pk_p_id PRIMARY KEY (p_id),
-    CONSTRAINT fk_p_c_category FOREIGN KEY (p_category) REFERENCES categories (c_id)
+    CONSTRAINT fk_p_category FOREIGN KEY (p_category) REFERENCES categories (c_id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_p_user FOREIGN KEY (p_user) REFERENCES users (u_id)
         ON UPDATE CASCADE ON DELETE CASCADE
 ) AUTO_INCREMENT = 100
   ENGINE = InnoDB COMMENT 'Products table';
@@ -55,6 +58,8 @@ CREATE TABLE IF NOT EXISTS products_imgs
 ### Insets ###
 INSERT INTO users (u_type, u_name, u_lastname, u_email, u_password)
     VALUE ('A', 'Abner', 'Perez', 'abner@email.com', '123456');
+INSERT INTO users (u_type, u_name, u_lastname, u_email, u_password)
+    VALUE ('U', 'Crys', 'Alvaro', 'crys@email.com', '123456');
 
 INSERT INTO categories (c_name)
 VALUES ('Electrónica'),
@@ -66,6 +71,106 @@ VALUES ('Electrónica'),
        ('Automóviles y Motocicletas'),
        ('Arte y Manualidades');
 
-SELECT u_id, u_type, u_name, u_lastname, u_email FROM users;
+# add/user
+DROP PROCEDURE IF EXISTS `add_user`;
+DELIMITER ;;
+CREATE PROCEDURE `add_user`(
+    IN type_u ENUM ('A', 'U'),
+    IN name_u VARCHAR(45),
+    IN lastname_u VARCHAR(45),
+    IN email_u VARCHAR(45),
+    IN password VARCHAR(80)
+)
+BEGIN
+    INSERT INTO users (u_type, u_name, u_lastname, u_email, u_password)
+        VALUE (type_u, name_u, lastname_u, email_u, password);
+    SELECT u_id, u_type, u_name, u_lastname, u_email FROM users ORDER BY u_id DESC LIMIT 1;
+END ;;
+DELIMITER ;
 
-SELECT * FROM categories;
+# add/product
+DROP PROCEDURE IF EXISTS `add_product`;
+DELIMITER ;;
+CREATE PROCEDURE `add_product`(
+    IN name_p VARCHAR(45),
+    IN price_p DECIMAL(9,2),
+    IN category_p INT UNSIGNED,
+    IN user_p INT UNSIGNED
+)
+BEGIN
+    INSERT INTO products (p_name, p_price, p_category, p_user)
+        VALUE (name_p, price_p, category_p, user_p);
+    SELECT * FROM products ORDER BY p_id DESC LIMIT 1;
+END ;;
+DELIMITER ;
+
+# add/product_img
+DROP PROCEDURE IF EXISTS `add_product_img`;
+DELIMITER ;;
+CREATE PROCEDURE `add_product_img`(
+    IN img_pi MEDIUMBLOB,
+    IN product_pi INT UNSIGNED
+)
+BEGIN
+    INSERT INTO products_imgs(pi_img, pi_product) VALUE (img_pi, product_pi);
+    SELECT pi_img, pi_product FROM products_imgs ORDER BY pi_id DESC LIMIT 1;
+END ;;
+DELIMITER ;
+
+# get/users/all
+DROP PROCEDURE IF EXISTS `get_users_all`;
+DELIMITER ;;
+CREATE PROCEDURE `get_users_all`()
+BEGIN
+    SELECT u_id, u_type, u_name, u_lastname, u_email FROM users;
+END ;;
+DELIMITER ;
+
+# get/users/regular
+DROP PROCEDURE IF EXISTS `get_users_regular`;
+DELIMITER ;;
+CREATE PROCEDURE `get_users_regular`()
+BEGIN
+    SELECT u_id, u_type, u_name, u_lastname, u_email FROM users WHERE u_type = 'U';
+END ;;
+DELIMITER ;
+
+# get/users/admin
+DROP PROCEDURE IF EXISTS `get_users_admin`;
+DELIMITER ;;
+CREATE PROCEDURE `get_users_admin`()
+BEGIN
+    SELECT u_id, u_type, u_name, u_lastname, u_email FROM users WHERE u_type = 'A';
+END ;;
+DELIMITER ;
+
+# get/users/admin
+DROP PROCEDURE IF EXISTS `get_categories`;
+DELIMITER ;;
+CREATE PROCEDURE `get_categories`()
+BEGIN
+    SELECT * FROM categories;
+END ;;
+DELIMITER ;
+
+# get/products
+DROP PROCEDURE IF EXISTS `get_products`;
+DELIMITER ;;
+CREATE PROCEDURE `get_products`()
+BEGIN
+    SELECT * FROM products;
+END ;;
+DELIMITER ;
+
+# get/products_img/
+DROP PROCEDURE IF EXISTS `get_products_imgs`;
+DELIMITER ;;
+CREATE PROCEDURE `get_products_imgs`(
+    IN product_id INT UNSIGNED
+)
+BEGIN
+    SELECT * FROM products_imgs WHERE pi_product = product_id;
+END ;;
+DELIMITER ;
+
+CALL get_products_imgs(104);
